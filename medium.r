@@ -1,4 +1,7 @@
-rm(list=ls())
+# ---- GeomScale (GSOC) ------
+# --- Randomized LP solver ---
+# --  Iasonas Nikolaou  ------
+
 library(volesti)
 
 #dot product
@@ -35,7 +38,7 @@ find_min = function(points, c) {
 # A, b: Polytope in H-representation, i.e. Ax <= b
 # c: cost vector
 # walk: WalkType for sampling
-# epsilon: calculate an err-optimal solution
+# epsilon: probability used for convergence
 # precision: required precision of the answer
 RCP = function(A, b, c, walk="CDHR", epsilon=0.001, precision=0.0001) {
   P = Hpolytope$new(A, b)
@@ -63,7 +66,7 @@ RCP = function(A, b, c, walk="CDHR", epsilon=0.001, precision=0.0001) {
 #expected output = (0, 0, 0)
 #cost:
 c = c(1,1,1)
-# Ax <= b
+#A, b
 A = rbind(c(1,0,0), c(0,1,0), c(0,0,1),
            c(-1,0,0), c(0,-1,0), c(0,0,-1))
 b = c(1,1,1,0,0,0)
@@ -72,15 +75,19 @@ epsilon = 0.0001
 precision = 0.000000001
 walk = "RDHR"
 
-RCP(A, b, c, walk, epsilon, precision)
+print(RCP(A, b, c, walk, epsilon, precision))
 
-#=== example 2 ====
+#=== test 2 ====
 #expected output = (0, 200)
-epsilon = 0.00001
-precision = 0.0000001
+#cost:
 c = c(-1, 1)
+#A, b
 A = rbind(c(1,0), c(0,1), c(1,1),
           c(-1,0), c(0,-1))
 b = c(200, 300, 400, 0, 0)
+#parameters
+epsilon = 0.00001
+precision = 0.0000001
 walk = "BW"
-RCP(A, b, c, walk, epsilon, precision)
+
+print(RCP(A, b, c, walk, epsilon, precision))
