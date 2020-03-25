@@ -1,7 +1,7 @@
 # ---- GeomScale (GSOC) ------
 # --- Randomized LP solver ---
 # --  Iasonas Nikolaou  ------
-
+rm(list=ls())
 library(volesti)
 
 #dot product
@@ -21,8 +21,6 @@ numOfSamples = function(k, epsilon) {
 }
 
 # find min point
-# given a set of points and a vector c
-# return the point x_i which minimizes c * x_i 
 find_min = function(points, c) {
   min_dot = dot(c, points[,1])
   min = points[,1]
@@ -38,7 +36,7 @@ find_min = function(points, c) {
 
 #randomized cutting plane algorithm
 # A, b: Polytope in H-representation, i.e. Ax <= b
-# c: cost vector (objective function)
+# c: cost vector
 # walk: WalkType for sampling
 # epsilon: probability used for convergence
 # precision: required precision of the answer
@@ -47,7 +45,7 @@ RCP = function(A, b, c, walk="CDHR", epsilon=0.001, precision=0.0001) {
   k = 1;
   N_k = numOfSamples(k, epsilon)
   points = sample_points(P, WalkType=walk, N=N_k)
-  P$A = rbind(A, c);
+  P$A = rbind(A, c); #comment
   x = 0
   x_new = 0
   repeat {
@@ -59,37 +57,35 @@ RCP = function(A, b, c, walk="CDHR", epsilon=0.001, precision=0.0001) {
     points = sample_points(P, WalkType=walk, N=N_k)
     
     if (dist(x, x_new) < precision) {
-      return(x_new)
+      return (k)
+      #return (x_new)
       break;
     }
   }
 }
-#=== example 1 =====
-#expected output = (0, 0, 0)
-#cost:
-c = c(1,1,1)
-#A, b
-A = rbind(c(1,0,0), c(0,1,0), c(0,0,1),
-           c(-1,0,0), c(0,-1,0), c(0,0,-1))
-b = c(1,1,1,0,0,0)
-#parameters
-epsilon = 0.0001
-precision = 0.000000001
-walk = "RDHR"
 
-print(RCP(A, b, c, walk, epsilon, precision))
+#benchmarks
+i = 0;
 
-#=== test 2 ====
-#expected output = (0, 200)
-#cost:
-c = c(-1, 1)
-#A, b
-A = rbind(c(1,0), c(0,1), c(1,1),
-          c(-1,0), c(0,-1))
-b = c(200, 300, 400, 0, 0)
-#parameters
-epsilon = 0.00001
-precision = 0.0000001
-walk = "BW"
+res = 3:99
+time = 3:99
+for (d in 3: 100) {
+  t1 = Sys.time()
+  P = GenCube(d, 'H')
+  A = P$A
+  b = P$b
+  c = runif(d, -1, 1)
+  res[i] = RCP(A, b, c)
+  t2 = Sys.time()
+  time[i] = (t2 - t1)/60
+  i = i + 1;
+}
+time
+plot(time, type="o", ann=FALSE)
+title(main="time - dimensions")
+title(xlab="dimensions")
+title(ylab="time")
+legend("topleft", legend=c("ε = 10E-3", "α = 10E-4"))
 
-print(RCP(A, b, c, walk, epsilon, precision))
+
+
