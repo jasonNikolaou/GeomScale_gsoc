@@ -10,7 +10,7 @@ dot <- function(a, b) {
   return(sum(res))
 }
 
-#distance
+#distance of 2 points
 dist = function(x1, x2) {
   return(sqrt(sum((x1 - x2) ^ 2)))
 }
@@ -44,12 +44,12 @@ find_min = function(points, c) {
 # precision: required precision of the answer
 RCP = function(A, b, c, walk="CDHR", epsilon=0.001, precision=0.0001) {
   P = Hpolytope$new(A, b)
-  k = 1;
+  k = 1; # iterations
   N_k = numOfSamples(k, epsilon)
   points = sample_points(P, WalkType=walk, N=N_k)
-  P$A = rbind(A, c);
-  x = 0
-  x_new = 0
+  P$A = rbind(A, c); # add constraint
+  x = 0 # current solution
+  x_new = 0 #
   repeat {
     x = x_new
     x_new = find_min(points, c)
@@ -57,10 +57,8 @@ RCP = function(A, b, c, walk="CDHR", epsilon=0.001, precision=0.0001) {
     k = k + 1
     N_k = numOfSamples(k, epsilon)
     points = sample_points(P, WalkType=walk, N=N_k)
-    
     if (dist(x, x_new) < precision) {
       return(x_new)
-      break;
     }
   }
 }
