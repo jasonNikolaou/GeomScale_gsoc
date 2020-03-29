@@ -3,7 +3,7 @@
 library(ggplot2)
 library(volesti)
 step <- 100
-for (walk in c("CDHR", "RDHR", "BW")) {
+for (walk in c("BW")) {
   P <- GenCube(100, 'H')
   points1 <- sample_points(P, WalkType = walk, walk_step = step, N=1000)
   g<-plot(ggplot(data.frame( x=points1[1,], y=points1[2,] )) +
